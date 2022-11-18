@@ -11,7 +11,7 @@
 	<cfset converter = new toscript.ToScript()>
 	<cftry>
 		<cfset scr = converter.toScript(fileContent=form.code)>
-		<cfoutput><pre>#encodeForHTML(scr.code)#</pre></cfoutput>
+		<cfoutput><pre>#encodeForHTML("<cfscript>" & scr.code & "</cfscript>")#</pre></cfoutput>
 		<cfdump var="#scr#">
 		<cfcatch type="any">
 			<cfdump var="#cfcatch#">

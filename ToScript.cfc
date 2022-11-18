@@ -57,6 +57,7 @@ component {
 							} else {
 								converter = getTagConverter(s.getName());
 								code = converter.toScript(s);
+
 								if (s.getName() == "cffunction") {
 									// add extra new line to space out functions
 									lineBreak(sb);
@@ -102,13 +103,20 @@ component {
 						}
 						i = s.getStartTagEndPosition();
 					}
+					
 				} else if (s.getStartPosition() > i) {
 					//past current marker
 					break;
 				} else if (s.isTag() && s.getEndTagStartPosition() == i) {
-					handleOutput(outputBuffer, sb);
+					
 					handledChar = true;	
-					converter = getTagConverter(s.getName());			
+					converter = getTagConverter(s.getName());	
+					if (converter.outputContent()) {
+						handleOutput(outputBuffer, sb);
+					}
+					else {
+						outputBuffer.setLength(0);
+					}
 					code = converter.toScriptEndTag(s);
 					//end tag
 					if (code == "}") {
@@ -127,15 +135,18 @@ component {
 						decreaseIndent();
 					}
 					i = s.getEndPosition();
+
 				} 
 			}
 			if (!handledChar) {
+				
 				local.outputChar = mid(content, i, 1);
 				if (local.outputChar == """") {
 					outputBuffer.append("""""");
 				} else {
 					outputBuffer.append(local.outputChar);
 				}
+				
 			}
 		}
 		result.converted = true;

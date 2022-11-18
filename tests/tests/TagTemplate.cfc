@@ -37,15 +37,16 @@
 	</cffunction>
 
 	<cffunction name="testCFQuery">
-		<cfset var rows = [ {"id":1,"title":"Dewey defeats Truman"}, {"id":2,"title":"Man walks on Moon"} ]>
-		<cfset var news = news = queryNew("id,title", "integer,varchar", rows)>
+		<cfset var rows = [ {"id":1,"title":"Dewey defeats Truman","live":0}, {"id":2,"title":"Man walks on Moon","live":1} ]>
+		<cfset var news = news = queryNew("id,title,live", "integer,varchar,boolean", rows)>
 		<cfset $assert.isEqual(arrayLen(rows), news.recordcount)>
 		<cfquery dbtype="query" name="local.result">
 			SELECT id, title
 			FROM news
-			WHERE id = <cfqueryparam value="1" cfsqltype="cf_sql_integer">
+			WHERE id IN (<cfqueryparam value="1,2" list="yes" cfsqltype="cf_sql_integer">)
+			AND   live = <cfqueryparam value="1"  cfsqltype="cf_sql_bit">
 		</cfquery>
-		<cfset $assert.isEqual(1, local.result.recordcount)>
+		<cfset $assert.isEqual(2, local.result.recordcount)>
 	</cffunction>
 
 

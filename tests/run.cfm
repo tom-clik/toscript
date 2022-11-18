@@ -23,12 +23,13 @@
 
 <!--- generate script version of test cfc --->
 <cfset converter = new toscript.ToScript()>
-<cftry>
+
+<!--- <cftry> --->
 	<cfset scr = converter.toScript(filePath=ExpandPath("tests/TagTemplate.cfc"))>
 
 	<cfset fileWrite(ExpandPath("tests/GeneratedScriptCode.cfc"), scr.code)>
 	
-	<cfcatch type="any">
+	<!--- <cfcatch type="any">
 		<cfheader statuscode="500" statustext="Script Conversion Failed">
 
 		<cfoutput>Script Conversion Issue: #encodeForHTML(cfcatch.message)# -- #encodeForHTML(cfcatch.detail)#</cfoutput>
@@ -37,7 +38,9 @@
 		</cfif>
 		<cfabort>
 	</cfcatch>
-</cftry>
+</cftry> --->
+
+<cfabort>
 
 <cfset r = new testbox.system.TestBox( directory="tests", reporter=url.reporter ) >
 <cfoutput>#r.run()#</cfoutput>

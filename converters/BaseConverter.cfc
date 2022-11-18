@@ -1,6 +1,7 @@
 component {
 	variables.options = {};
 	public function init(options) {
+		variables._outputContent = 1;
 		variables.options = arguments.options;
 		return this;
 	}
@@ -79,6 +80,64 @@ component {
 
 	public string function getLineBreak() {
 		return Chr(13) & Chr(10);
+	}
+
+	public string function formatStruct(required struct data) {
+		var elems = [];
+		var s = "";
+		for (local.key in arguments.data) {
+			local.value = arguments.data[local.key];
+			s = getIndentChars() & local.key & " = ";
+			if (isStruct(local.value)) {
+				local.vals = [];
+				for (local.subkey in local.value) {
+					local.vals.append(local.subkey & "=" & checkQuotedVar(local.value[local.subkey]));
+				}
+				s &= "{" & local.vals.toList(", ") & "}";
+			}
+			else if (isArray(local.value)) {
+				s &= "[" & listQualify(arrayToList(local.value), """",",","char") & "]";
+			}
+			else {
+				s &= """" & local.value & """";
+			}
+			elems.append(s);
+		}
+
+		return getIndentChars() & "{"  & getLineBreak() & elems.toList("," & getLineBreak()) & "}";
+	}
+
+	/**
+	 * @hint Add quotes for a struct entry if needed
+	 *
+	 * Wrap a values in quotes if it isn't a variable name. Test is whether it starts and
+	 * ends with # or if it's true|fase
+	 * 
+	 * For values parsed from a tag entry e.g ="true" or ="#myval#", 
+	 * 
+	 * @value   
+	 */
+	private string function checkQuotedVar(required string value) {
+
+		if ((Left(arguments.value,1) eq "##" AND Right(arguments.value,1) eq "##")) {
+			arguments.value = ListFirst(arguments.value,"##");	
+		} 
+		else if (NOT listFindNoCase("true,false", arguments.value)) {
+			arguments.value =  """" & arguments.value & """";
+		}
+
+		return arguments.value;
+
+	}
+
+	/**
+	 * Whether to show the tag content in a cfouput tag (default) or to suppress e.g for cfquery
+	 * where it is processed sepately.
+	 * 
+	 * @return {[type]} [description]
+	 */
+	public boolean function outputContent() {
+		return variables._outputContent;
 	}
 
 }
